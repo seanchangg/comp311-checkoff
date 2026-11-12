@@ -1,0 +1,7 @@
+SIMD/Vectorization Compiler Optimization:
+
+SIMD/Vectorization Optimizations are special instructions that the compiler can issue to the CPU to utilize its special SIMD registers, which are 128-256 bit wide registers that correspond with SIMD logic units that can process multiple elements in parallel. I explored how these optimizations improved program performance given different underlying circumstances, and also in what scenarios SIMD fit best. 
+
+My most interesting discoveries: SIMD provides much larger speedups when size is large, since data no longer fits in a CPU's L1/L2 cache and the cost of accessing faraway memory is larger. Because SIMD enables fewer overall memory accesses, its advantage grows when the price of memory access is larger.
+At -02 or higher, the compiler will completely delete your vector if you do not use its elements meaningfully. Even when computing a sum and tracking it, the compiler simply inserted the right result and did not even allocate the vectors it was looping over. In order to indicate that vectors must be properly instantiated and looped over, they must be marked as volatile.
+At -02 or higher, common subexpressions get merged, like when I was trying to populate the vector with predictable numbers from 1->SIZE. Instead of actually calculating those numbers and inserting them into memory, the compiler bypassed everything and directly computed results by offsetting the underlying value every time and unrolling the loop. By making contents unpredictable with rand(), this problem was solved.

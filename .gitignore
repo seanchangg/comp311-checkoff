@@ -1,0 +1,8 @@
+# Assembly output
+*.s
+
+# Compiled output
+a.out
+*.o
+*.out
+*.dSYM/
